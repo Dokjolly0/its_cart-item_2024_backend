@@ -1,14 +1,18 @@
 import passport from "passport";
-import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { UserModel } from "../../../api/user/user.model";
+import dotenv from "dotenv";
+import { DotEnvError } from "../../../errors/dotenv";
 
-export const JWT_SECRET = 'token_secret';
+dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new DotEnvError();
 
 passport.use(
   new JwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: JWT_SECRET
+      secretOrKey: JWT_SECRET,
     },
     async (payload, done) => {
       try {
@@ -16,12 +20,11 @@ passport.use(
         if (user) {
           done(null, user.toObject());
         } else {
-          done(null, false, { message: 'invalid token'});
+          done(null, false, { message: "invalid token" });
         }
-
-      } catch(err) {
+      } catch (err) {
         done(err);
       }
     }
   )
-)
+);
