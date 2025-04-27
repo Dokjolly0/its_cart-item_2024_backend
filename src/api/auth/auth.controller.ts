@@ -4,14 +4,17 @@ import userService from "../user/user.service";
 import { AddUserDTO } from "./auth.dto";
 import { omit, pick } from "lodash";
 import { UserExistsError } from "../../errors/user-exists";
-import passport from "passport";
+import passport, { use } from "passport";
 import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { DotEnvError } from "../../errors/dotenv";
+import { User } from "../user/user.entity";
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new DotEnvError();
+const EXPIRED_IN_JWT = process.env.EXPIRED_IN_JWT;
+if (!EXPIRED_IN_JWT) throw new DotEnvError();
 
 export const login = async (
   req: TypedRequest,
@@ -34,7 +37,16 @@ export const login = async (
         return;
       }
 
-      const token = jwt.sign(user, JWT_SECRET, { expiresIn: "7 days" });
+      if (!user.isActive) {
+        res.status(400).json({
+          error: "LoginError",
+          message:
+            "Account non attivato. Controlla la tua casella mail per confermare la registrazione.",
+        });
+        return;
+      }
+
+      const token = jwt.sign(user, JWT_SECRET, { expiresIn: EXPIRED_IN_JWT });
 
       res.status(200);
       res.json({
@@ -55,12 +67,45 @@ export const add = async (
   next: NextFunction
 ) => {
   try {
-    const userData = omit(req.body, "username", "password");
+    const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
+
+    const userData: User = {
+      firstName: userBody.firstName,
+      lastName: userBody.lastName,
+      picture: userBody.picture ?? null,
+      birthDate: userBody.birthDate ?? null,
+      gender: userBody.gender ?? null,
+      addressInfo: userBody.addressInfo ?? {
+        address: null,
+        city: null,
+        state: null,
+        country: null,
+        zipCode: null,
+        location: {
+          latitude: null,
+          longitude: null,
+        },
+      },
+
+      preferredLanguage: userBody.preferredLanguage ?? null,
+      timeZone: userBody.timeZone ?? null,
+
+      isActive: false,
+      role: userBody.role ?? "user",
+      status: null,
+
+      createdAt: new Date(),
+      updatedAt: null,
+      lastLogin: null,
+
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+    };
 
     const newUser = await userService.add(userData, credentials);
 
-    res.json(newUser);
+    res.status(201).json(newUser);
   } catch (e) {
     if (e instanceof UserExistsError) {
       res.status(400);
