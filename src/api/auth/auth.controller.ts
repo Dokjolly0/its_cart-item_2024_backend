@@ -10,6 +10,8 @@ import dotenv from "dotenv";
 import { DotEnvError } from "../../errors/dotenv";
 import { User } from "../user/user.entity";
 import { EmptyStringError } from "../../errors/empty-string";
+import { verifyEmptyField } from "../../utils/verify-empty-field";
+import { InvalidArgumentTypeError } from "../../errors/invalid-argument-type";
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -71,12 +73,7 @@ export const add = async (
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
 
-    if (!userBody.firstName || !userBody.lastName) {
-      const emptyFields: string[] = [];
-      if (!userBody.firstName) emptyFields.push("firstName");
-      if (!userBody.lastName) emptyFields.push("lastName");
-      throw new EmptyStringError(emptyFields);
-    }
+    verifyEmptyField(userBody, EmptyStringError);
 
     const userData: User = {
       firstName: userBody.firstName,
