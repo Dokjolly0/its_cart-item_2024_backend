@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Request, Response, NextFunction } from "express";
 import { TypedRequest } from "../../utils/typed-request";
-import { UnauthorizedError } from "../../errors/UnoutorizedError";
+import { UnauthorizedError } from "../../errors/unoutorized-error";
 import { NotFoundError } from "../../errors/not-found";
 import { UserModel } from "./user.model";
 import userService from "./user.service";

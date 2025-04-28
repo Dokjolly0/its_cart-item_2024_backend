@@ -1,5 +1,5 @@
 import { UserExistsError } from "../../errors/user-exists";
-import { UnauthorizedError } from "../../errors/UnoutorizedError";
+import { UnauthorizedError } from "../../errors/unoutorized-error";
 import { NotFoundError } from "../../errors/not-found";
 import { UserIdentityModel } from "../../utils/auth/local/user-identity.model";
 import { User } from "./user.entity";
