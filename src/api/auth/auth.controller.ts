@@ -9,6 +9,7 @@ import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { DotEnvError } from "../../errors/dotenv";
 import { User } from "../user/user.entity";
+import { EmptyStringError } from "../../errors/empty-string";
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -70,6 +71,13 @@ export const add = async (
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
 
+    if (!userBody.firstName || !userBody.lastName) {
+      const emptyFields: string[] = [];
+      if (!userBody.firstName) emptyFields.push("firstName");
+      if (!userBody.lastName) emptyFields.push("lastName");
+      throw new EmptyStringError(emptyFields);
+    }
+
     const userData: User = {
       firstName: userBody.firstName,
       lastName: userBody.lastName,
@@ -110,6 +118,12 @@ export const add = async (
     if (err instanceof UserExistsError) {
       res.status(400);
       res.send(err.message);
+    } else if (err instanceof EmptyStringError) {
+      res.status(400).json({
+        error: err.name,
+        message: err.message,
+        emptyFields: err.fields,
+      });
     } else {
       next(err);
     }
