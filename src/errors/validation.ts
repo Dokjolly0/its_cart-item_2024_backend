@@ -7,28 +7,33 @@ export class ValidationError extends Error {
   constructor(errors: OriginalValidationError[]) {
     super();
     this.originalErrors = errors;
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
     this.message = this.originalErrors
-      .map(err => {
-      return Object.values(err.constraints as any);
-    }).join('; ');
+      .map((err) => {
+        return Object.values(err.constraints as any);
+      })
+      .join("; ");
   }
-
 }
 
-export const validationErrorHandler = async (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const validationErrorHandler = async (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (err instanceof ValidationError) {
     res.status(400);
     res.json({
       error: err.name,
       message: err.message,
-      details: err.originalErrors.map(e => ({
+      details: err.originalErrors.map((e) => ({
         property: e.property,
         constraints: e.constraints,
-        value: e.value
-      })) 
-    })
+        value: e.value,
+      })),
+    });
   } else {
     next(err);
   }
-}
+};

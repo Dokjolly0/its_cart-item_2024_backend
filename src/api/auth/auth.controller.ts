@@ -11,13 +11,18 @@ import { DotEnvError } from "../../errors/dotenv";
 import { User } from "../user/user.entity";
 import { EmptyStringError } from "../../errors/empty-string";
 import { verifyEmptyField } from "../../utils/verify-empty-field";
-import { InvalidArgumentTypeError } from "../../errors/invalid-argument-type";
+import { fillDefaults } from "../../utils/fill-default-object";
+import { userToFieldsInput } from "../user/user.utils";
 
 dotenv.config();
+
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new DotEnvError();
 const EXPIRED_IN_JWT = process.env.EXPIRED_IN_JWT;
 if (!EXPIRED_IN_JWT) throw new DotEnvError();
+const IS_REQUIRED_EMAIL_VERIFICATION =
+  process.env.IS_REQUIRED_EMAIL_VERIFICATION;
+if (!IS_REQUIRED_EMAIL_VERIFICATION) throw new DotEnvError();
 
 export const login = async (
   req: TypedRequest,
@@ -72,41 +77,17 @@ export const add = async (
   try {
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
+    const isActiveUser: boolean =
+      IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
 
-    verifyEmptyField(userBody, EmptyStringError);
-
-    const userData: User = {
-      firstName: userBody.firstName,
-      lastName: userBody.lastName,
-      picture: userBody.picture ?? null,
-      birthDate: userBody.birthDate ?? null,
-      gender: userBody.gender ?? null,
-      addressInfo: userBody.addressInfo ?? {
-        address: null,
-        city: null,
-        state: null,
-        country: null,
-        zipCode: null,
-        location: {
-          latitude: null,
-          longitude: null,
-        },
-      },
-
-      preferredLanguage: userBody.preferredLanguage ?? null,
-      timeZone: userBody.timeZone ?? null,
-
-      isActive: false,
+    let userData: User = {
+      ...userBody,
+      isActive: isActiveUser,
       role: userBody.role ?? "user",
-      status: null,
-
       createdAt: new Date(),
-      updatedAt: null,
-      lastLogin: null,
-
-      resetPasswordToken: null,
-      resetPasswordExpires: null,
     };
+    userData = fillDefaults(userBody, userData);
+    verifyEmptyField(userToFieldsInput(userData), EmptyStringError);
 
     const newUser = await userService.add(userData, credentials);
 

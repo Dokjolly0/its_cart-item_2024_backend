@@ -1,4 +1,8 @@
-type FieldsInput = { name: string; value: unknown }[] | Record<string, unknown>;
+import { User } from "../api/user/user.entity";
+
+export type FieldsInput =
+  | { name: string; value: unknown }[]
+  | Record<string, unknown>;
 
 export const verifyEmptyField = (
   fields: FieldsInput,

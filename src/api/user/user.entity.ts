@@ -5,7 +5,7 @@ export interface User {
   // Informazioni Personali di Base
   firstName: string;
   lastName: string;
-  picture: string;
+  picture?: string;
   birthDate?: Date | string | null;
   gender?: string | null;
 
