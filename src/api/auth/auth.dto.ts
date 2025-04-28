@@ -46,6 +46,7 @@ export class AddUserDTO {
   @IsString()
   timeZone: string | null;
 
+  @IsOptional()
   @IsString()
   role: string;
 

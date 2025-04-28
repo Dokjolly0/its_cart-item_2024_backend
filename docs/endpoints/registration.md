@@ -12,21 +12,19 @@
 
 ```json
 {
-  "firstName": "",
-  "lastName": "",
+  "firstName": "User first name",
+  "lastName": "User last name",
   "username": "user@email.it",
-  "password": "Password123",
-  "role": "user"
+  "password": "Password123"
 }
 ```
 
 ## Campi obbligatori:
 
-- firstName (stringa non vuota)
-- lastName (stringa non vuota)
-- username (email valida)
-- password (minimo 8 caratteri)
-- role (default: "user")
+- `firstName` (stringa non vuota)
+- `lastName` (stringa non vuota)
+- `username` (email valida)
+- `password` (minimo 8 caratteri)
 
 ### ➡️ Full Registration Body (opzionale)
 

@@ -106,12 +106,12 @@ export const add = async (
     const newUser = await userService.add(userData, credentials);
 
     res.status(201).json(newUser);
-  } catch (e) {
-    if (e instanceof UserExistsError) {
+  } catch (err) {
+    if (err instanceof UserExistsError) {
       res.status(400);
-      res.send(e.message);
+      res.send(err.message);
     } else {
-      next(e);
+      next(err);
     }
   }
 };
