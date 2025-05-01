@@ -11,12 +11,20 @@ import { AddressInfoDTO } from "../user/user.dto";
 import { IsValidAddressInfo } from "../../validators/IsValidAddressInfo";
 
 export class AddUserDTO {
+  // Requested fields
   @IsString()
   firstName: string;
 
   @IsString()
   lastName: string;
 
+  @IsEmail()
+  username: string;
+
+  @MinLength(8)
+  password: string;
+
+  // Optional fields
   @IsOptional()
   @IsString()
   picture: string;
@@ -30,15 +38,6 @@ export class AddUserDTO {
   gender: string | null;
 
   @IsOptional()
-  @ValidateNested()
-  @Type(() => AddressInfoDTO)
-  @IsValidAddressInfo({
-    message:
-      "L'oggetto addressInfo deve contenere address, city, state, country, zipCode e location (con latitude e longitude).",
-  })
-  addressInfo: AddressInfoDTO;
-
-  @IsOptional()
   @IsString()
   preferredLanguage: string | null;
 
@@ -49,12 +48,6 @@ export class AddUserDTO {
   @IsOptional()
   @IsString()
   role: string;
-
-  @IsEmail()
-  username: string;
-
-  @MinLength(8)
-  password: string;
 }
 
 export class LoginDTO {
