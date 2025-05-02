@@ -11,8 +11,8 @@ import { DotEnvError } from "../../errors/dotenv";
 import { User } from "../user/user.entity";
 import { EmptyStringError } from "../../errors/empty-string";
 import { verifyEmptyField } from "../../utils/verify-empty-field";
-import { fillDefaults } from "../../utils/fill-default-object";
 import { userToFieldsInput } from "../user/user.utils";
+import { getIP } from "../../utils/fetch-ip";
 
 dotenv.config();
 
@@ -77,18 +77,19 @@ export const add = async (
   try {
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
+    const ip: string | undefined = await getIP();
+
     const isActiveUser: boolean =
       IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
 
     let userData: User = {
       ...userBody,
+      lastAllowedIp: ip,
       isActive: isActiveUser,
       role: userBody.role ?? "user",
       createdAt: new Date(),
     };
-    userData = fillDefaults(userBody, userData);
     verifyEmptyField(userToFieldsInput(userData), EmptyStringError);
-
     const newUser = await userService.add(userData, credentials);
 
     res.status(201).json(newUser);

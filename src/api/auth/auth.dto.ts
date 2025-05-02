@@ -31,19 +31,19 @@ export class AddUserDTO {
 
   @IsOptional()
   @IsDateString()
-  birthDate: Date | string | null;
+  birthDate: Date | string | undefined;
 
   @IsOptional()
   @IsString()
-  gender: string | null;
+  gender: string | undefined;
 
   @IsOptional()
   @IsString()
-  preferredLanguage: string | null;
+  preferredLanguage: string | undefined;
 
   @IsOptional()
   @IsString()
-  timeZone: string | null;
+  timeZone: string | undefined;
 
   @IsOptional()
   @IsString()

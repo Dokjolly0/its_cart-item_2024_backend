@@ -6,39 +6,39 @@ export interface User {
   firstName: string;
   lastName: string;
   picture?: string;
-  birthDate?: Date | string | null;
-  gender?: string | null;
+  birthDate?: Date | string | undefined;
+  gender?: string | undefined;
 
   // Preference
-  preferredLanguage?: string | null;
-  timeZone?: string | null;
+  preferredLanguage?: string | undefined;
+  timeZone?: string | undefined;
 
   // Authentication Info
   isActive: boolean;
-  status?: string | null;
+  status?: string | undefined;
   role: string;
 
   // Security Info
   createdAt: Date | string;
-  updatedAt?: Date | string | null;
-  lastLogin?: Date | string | null;
-  lastLoginIp?: string | null;
-  allowedIps?: string[] | null;
+  updatedAt?: Date | string | undefined;
+  lastLogin?: Date | string | undefined;
+  lastAllowedIp?: string | undefined;
+  allowedIps?: string[] | undefined;
 
   // Token
-  resetPasswordToken?: string | null;
-  resetPasswordExpires?: Date | string | null;
+  resetPasswordToken?: string | undefined;
+  resetPasswordExpires?: Date | string | undefined;
 
   // Address Info
   addressInfo?: {
-    address: string | null;
-    city: string | null;
-    state: string | null;
-    country: string | null;
-    zipCode: string | null;
+    address: string | undefined;
+    city: string | undefined;
+    state: string | undefined;
+    country: string | undefined;
+    zipCode: string | undefined;
     location: {
-      latitude: number | null;
-      longitude: number | null;
+      latitude: number | undefined;
+      longitude: number | undefined;
     };
   };
 }
