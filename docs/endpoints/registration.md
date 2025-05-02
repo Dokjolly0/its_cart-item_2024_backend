@@ -52,6 +52,27 @@
 - preferredLanguage (stringa)
 - timeZone (stringa)
 
+## ❌ Dotenv error
+
+- Se viene rilevata la mancanza di un valore nel file `.env` riceverai un errore di tipo `DotenvError`. Vedi esempio
+
+```Error
+its_cart-item_2024_backend\src\api\auth\auth.controller.ts:20
+if (!JWT_SECRET) throw new DotEnvError();
+
+DotEnvError: Entity not found in dotenv
+    at Object.<anonymous> (its_cart-item_2024_backend\src\api\auth\auth.controller.ts:20:24)
+    at Module._compile (node:internal/modules/cjs/loader:1734:14)
+    at Module.m._compile (its_cart-item_2024_backend\node_modules\ts-node\src\index.ts:1618:23)
+    at loadTS (node:internal/modules/cjs/loader:1826:10)
+    at Object.require.extensions.<computed> [as .ts] (its_cart-item_2024_backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1469:32)
+    at Function._load (node:internal/modules/cjs/loader:1286:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.require (node:internal/modules/cjs/loader:1491:12)
+```
+
 ## ❌ Possibili Errori di Validazione
 
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; text-align: left; width: 100%;">
@@ -114,7 +135,6 @@ _Risposta_:
 {
   "firstName": "Mario",
   "lastName": "Rossi",
-  "picture": null,
   "role": "user",
   "isActive": false,
   "createdAt": "2025-04-27T13:04:58.183Z",

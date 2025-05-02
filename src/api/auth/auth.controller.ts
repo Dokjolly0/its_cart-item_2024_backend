@@ -78,11 +78,10 @@ export const add = async (
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
     const ip: string | undefined = await getIP();
-
     const isActiveUser: boolean =
       IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
 
-    let userData: User = {
+    const userData: User = {
       ...userBody,
       lastAllowedIp: ip,
       isActive: isActiveUser,
