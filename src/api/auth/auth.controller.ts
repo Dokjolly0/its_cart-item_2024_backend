@@ -92,18 +92,18 @@ export const add = async (
     const newUser = await userService.add(userData, credentials);
 
     res.status(201).json(newUser);
-  } catch (err) {
-    if (err instanceof UserExistsError) {
-      res.status(400);
-      res.send(err.message);
-    } else if (err instanceof EmptyStringError) {
-      res.status(400).json({
-        error: err.name,
-        message: err.message,
-        emptyFields: err.fields,
-      });
-    } else {
-      next(err);
+  } catch (err: any) {
+    switch (err.constructor) {
+      case UserExistsError:
+        res.status(400).send(err.message);
+      case EmptyStringError:
+        res.status(400).json({
+          error: err.name,
+          message: err.message,
+          emptyFields: err.fields,
+        });
+      default:
+        next(err);
     }
   }
 };
