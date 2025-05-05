@@ -13,6 +13,7 @@ import { EmptyStringError } from "../../errors/empty-string";
 import { verifyEmptyField } from "../../utils/verify-empty-field";
 import { userToFieldsInput } from "../user/user.utils";
 import { getIP } from "../../utils/fetch-ip";
+import { UserModel } from "../user/user.model";
 
 dotenv.config();
 
@@ -30,55 +31,55 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
-    const authMiddleware = passport.authenticate("local", async (err, user, info) => {
-      if (err) {
-        next(err);
-        return;
-      }
+    const authMiddleware = passport.authenticate(
+      "local",
+      async (err, user, info) => {
+        if (err) {
+          next(err);
+          return;
+        }
 
-      if (!user) {
-        res.status(401);
+        if (!user) {
+          res.status(401);
+          res.json({
+            error: "LoginError",
+            message: info.message,
+          });
+          return;
+        }
+
+        if (!user.isActive) {
+          res.status(400).json({
+            error: "LoginError",
+            message:
+              "Account non attivato. Controlla la tua casella mail per confermare la registrazione.",
+          });
+          return;
+        }
+
+        const userTmp = await UserModel.findById(user.id);
+        const ip: string | undefined = await getIP();
+        if (userTmp) {
+          if (ip && userTmp.allowedIps && !userTmp.allowedIps.includes(ip)) {
+            userTmp.allowedIps.push(ip);
+            await userTmp.save();
+          }
+          userTmp.lastLogin = new Date();
+          userTmp.lastUpdateAt = new Date();
+          userTmp.lastAllowedIp = ip;
+        }
+
+        console.log(userTmp);
+
+        const token = jwt.sign(user, JWT_SECRET, { expiresIn: EXPIRED_IN_JWT });
+
+        res.status(200);
         res.json({
-          error: "LoginError",
-          message: info.message,
+          user,
+          token,
         });
-        return;
       }
-
-      if (!user.isActive) {
-        res.status(400).json({
-          error: "LoginError",
-          message:
-            "Account non attivato. Controlla la tua casella mail per confermare la registrazione.",
-        });
-        return;
-      }
-
-      /*
-      TypeError: user.save is not a function
-      at C:\Projects\its_cart-item_2024_backend\src\api\auth\auth.controller.ts:60:20
-      at Generator.next (<anonymous>)
-      at fulfilled (C:\Projects\its_cart-item_2024_backend\src\api\auth\auth.controller.ts:28:58)
-      at processTicksAndRejections (node:internal/process/task_queues:95:5)
-      */
-      // Breack
-      // const ip: string | undefined = await getIP();
-      // if (ip && user.allowedIps && !user.allowedIps.includes(ip)) {
-      //   user.allowedIps.push(ip);
-      //   await user.save();
-      // } else if (ip && !user.allowedIps) {
-      //   user.allowedIps = [ip];
-      //   await user.save();
-      // }
-
-      const token = jwt.sign(user, JWT_SECRET, { expiresIn: EXPIRED_IN_JWT });
-
-      res.status(200);
-      res.json({
-        user,
-        token,
-      });
-    });
+    );
 
     authMiddleware(req, res, next);
   } catch (e) {

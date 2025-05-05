@@ -20,7 +20,7 @@ export interface User {
 
   // Security Info
   createdAt: Date | string;
-  updatedAt?: Date | string | undefined;
+  lastUpdateAt?: Date | string | undefined;
   lastLogin?: Date | string | undefined;
   lastAllowedIp?: string | undefined;
   allowedIps?: string[] | undefined;

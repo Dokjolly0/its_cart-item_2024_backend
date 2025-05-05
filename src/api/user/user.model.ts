@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema<User>({
 
   // Timestamp di Attività
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: undefined },
+  lastUpdateAt: { type: Date, default: undefined },
   lastLogin: { type: Date, default: undefined },
   lastAllowedIp: { type: String || undefined, default: undefined },
   allowedIps: { type: [String], default: [] },
