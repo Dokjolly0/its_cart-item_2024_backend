@@ -30,7 +30,7 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
-    const authMiddleware = passport.authenticate("local", (err, user, info) => {
+    const authMiddleware = passport.authenticate("local", async (err, user, info) => {
       if (err) {
         next(err);
         return;
@@ -53,6 +53,23 @@ export const login = async (
         });
         return;
       }
+
+      /*
+      TypeError: user.save is not a function
+      at C:\Projects\its_cart-item_2024_backend\src\api\auth\auth.controller.ts:60:20
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Projects\its_cart-item_2024_backend\src\api\auth\auth.controller.ts:28:58)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      */
+      // Breack
+      // const ip: string | undefined = await getIP();
+      // if (ip && user.allowedIps && !user.allowedIps.includes(ip)) {
+      //   user.allowedIps.push(ip);
+      //   await user.save();
+      // } else if (ip && !user.allowedIps) {
+      //   user.allowedIps = [ip];
+      //   await user.save();
+      // }
 
       const token = jwt.sign(user, JWT_SECRET, { expiresIn: EXPIRED_IN_JWT });
 
@@ -78,12 +95,15 @@ export const add = async (
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
     const ip: string | undefined = await getIP();
+    const allowedIps: string[] = [];
+    if (ip) allowedIps.push(ip);
     const isActiveUser: boolean =
       IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
 
     const userData: User = {
       ...userBody,
       lastAllowedIp: ip,
+      allowedIps: allowedIps,
       isActive: isActiveUser,
       role: userBody.role ?? "user",
       createdAt: new Date(),
