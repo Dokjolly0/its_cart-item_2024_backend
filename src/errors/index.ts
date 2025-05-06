@@ -4,8 +4,10 @@ import { validationErrorHandler } from "./validation";
 import { dotenvHandler } from "./dotenv";
 import { emptyStringHandler } from "./empty-string";
 import { invalidArgumentTypeHandler } from "./invalid-argument-type";
+import { unauthorizedHandler } from "./unoutorized-error";
 
 export const errorHandlers = [
+  unauthorizedHandler,
   notFoundHandler,
   validationErrorHandler,
   genericHandler,
