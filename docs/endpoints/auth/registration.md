@@ -1,6 +1,6 @@
 # 📄 API Registration
 
-### 📍 Endpoint
+## 📍 Endpoint
 
 - POST `http://localhost:PORT/api/register`
 - `PORT` deve essere specificato nel file .env.

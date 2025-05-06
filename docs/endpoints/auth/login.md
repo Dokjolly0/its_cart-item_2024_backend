@@ -1,14 +1,11 @@
 # 📄 API Login
 
-### 📍 Endpoint
+## 📍 Endpoint
 
 - POST `http://localhost:PORT/api/login`
 - `PORT` deve essere specificato nel file .env.
 
 ## 🧩 Body richiesto
-
-### ➡️ Minimal Login Body
-
 ```json
 {
   "username": "user@email.it",
@@ -16,38 +13,8 @@
 }
 ```
 
-## ❌ Possibili Errori di Validazione
-
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; text-align: left; width: 100%;">
-  <thead style="background-color: rgb(167, 157, 157);">
-    <tr>
-      <th>Tipo di Errore</th>
-      <th>Causa</th>
-      <th>Esempio di Messaggio di Errore</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Campo mancante o vuoto</td>
-      <td>firstName, lastName, role, username, password obbligatori</td>
-      <td>"firstName must be a string"</td>
-    </tr>
-    <tr>
-      <td>Email non valida</td>
-      <td>username deve essere un'email corretta</td>
-      <td>"username must be an email"</td>
-    </tr>
-    <tr>
-      <td>Password troppo corta</td>
-      <td>password minimo 8 caratteri</td>
-      <td>"password must be longer than or equal to 8 characters"</td>
-    </tr>
-  </tbody>
-</table>
-
 ## 🚀 Esempio Completo Loign (Successo)
 _Body_:
-
 ```json
 {
     "username": "user@email.it",
@@ -56,7 +23,6 @@ _Body_:
 ```
 
 _Risposta_:
-
 ```json
 {
     "user": {
@@ -76,21 +42,36 @@ _Risposta_:
 }
 ```
 
-## 🚀 Esempio Completo Loign (Utente o password sbagliati)
+## 🚀 Esempio Completo Loign (username o password sbagliati)
 _Body_:
-
 ```json
 {
-    "username": "user5@email.it",
+    "username": "user@email.it",
     "password": "Password123"
 }
 ```
 
 _Risposta_:
-
 ```json
 {
     "error": "LoginError",
-    "message": "username user5@email.it not found"
+    "message": "username user@email.it not found"
+}
+```
+
+## 🚀 Esempio Completo Loign (Utente non attivato)
+_Body_:
+```json
+{
+    "username": "user@email.it",
+    "password": "Password123"
+}
+```
+
+_Risposta_:
+```json
+{
+    "error": "LoginError",
+    "message": "Account non attivato. Controlla la tua casella mail per confermare la registrazione."
 }
 ```
