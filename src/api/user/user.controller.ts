@@ -21,7 +21,12 @@ export const showAllUsers = async (
   next: NextFunction
 ) => {
   try {
+    let ADMIN_USER_NAME: string = process.env.ADMIN_USER_NAME!;
+    if (!ADMIN_USER_NAME) ADMIN_USER_NAME = "admin";
+
     const user = req.user!;
+    if (!user) throw new UnauthorizedError();
+
     const users = await userService.showAllUsers(user.id!);
     res.json(users);
   } catch (err) {
