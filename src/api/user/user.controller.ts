@@ -12,7 +12,7 @@ export const me = async (
   res: Response,
   next: NextFunction
 ) => {
-  res.json(req.user!);
+  res.json(req.user);
 };
 
 export const showAllUsers = async (

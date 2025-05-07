@@ -114,17 +114,6 @@ export const add = async (
 
     res.status(201).json(newUser);
   } catch (err: any) {
-    switch (err.constructor) {
-      case UserExistsError:
-        res.status(400).send(err.message);
-      case EmptyStringError:
-        res.status(400).json({
-          error: err.name,
-          message: err.message,
-          emptyFields: err.fields,
-        });
-      default:
-        next(err);
-    }
+    next(err);
   }
 };

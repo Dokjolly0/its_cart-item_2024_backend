@@ -5,7 +5,7 @@ import { me, showAllUsers } from "./user.controller";
 const router = express.Router();
 
 router.get("/me", isAuthenticated, me);
-router.get("/users", showAllUsers);
+router.get("/users", isAuthenticated, showAllUsers);
 // router.get("/user/:fullName", findUserByFullName);
 // router.post("/reset-password", resetPassword); // Reimposta la password
 // router.get("/validate-password/:oldPassword", validatePassword);
