@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 export class DotEnvError extends Error {
   constructor() {
     super("Entity not found in dotenv");
+    this.name = "DotEnvError";
+    this.message = "Entity not found in dotenv";
   }
 }
 
@@ -15,8 +17,8 @@ export const dotenvHandler = (
   if (err instanceof DotEnvError) {
     res.status(404);
     res.json({
-      error: "DotEnvError",
-      message: "Entity not found in dotenv",
+      error: err.name,
+      message: err.message,
     });
   } else {
     next(err);

@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 export class NotFoundError extends Error {
   constructor() {
     super("Entity not found");
+    this.name = "NotFoundError";
+    this.message = "Entity not found";
   }
 }
 
@@ -15,8 +17,8 @@ export const notFoundHandler = (
   if (err instanceof NotFoundError) {
     res.status(404);
     res.json({
-      error: "NotFoundError",
-      message: "Entity not found",
+      error: err.name,
+      message: err.message,
     });
   } else {
     next(err);

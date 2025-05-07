@@ -6,8 +6,8 @@ export class EmptyStringError extends Error {
   constructor(fields: string[] | string = []) {
     const fieldsArray = Array.isArray(fields) ? fields : [fields];
     super(`Empty string found in fields: ${fieldsArray.join(", ")}`);
-    this.fields = fieldsArray;
     this.name = "EmptyStringError";
+    this.fields = fieldsArray;
   }
 }
 
