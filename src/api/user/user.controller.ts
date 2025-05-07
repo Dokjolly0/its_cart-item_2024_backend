@@ -21,39 +21,9 @@ export const showAllUsers = async (
   next: NextFunction
 ) => {
   try {
-    let ADMIN_USER_NAME: string = process.env.ADMIN_USER_NAME!;
-    if (!ADMIN_USER_NAME) ADMIN_USER_NAME = "admin";
-
     const user = req.user!;
     if (!user) throw new UnauthorizedError();
-
     const users = await userService.showAllUsers(user.id!);
-    res.json(users);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const findUserByFullName = async (
-  req: TypedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const user = req.user!;
-    const fullName: string = req.params.fullName as string; // Assicurati che fullName sia di tipo stringa
-    const spaceIndex = fullName.indexOf(" ");
-    const firstName =
-      spaceIndex !== -1 ? fullName.substring(0, spaceIndex) : fullName;
-    const lastName =
-      spaceIndex !== -1 ? fullName.substring(spaceIndex + 1) : "";
-
-    const users = await userService.findUserByFullName(
-      user.id!,
-      firstName,
-      lastName
-    );
-    if (!users) throw new NotFoundError();
     res.json(users);
   } catch (err) {
     next(err);
@@ -70,6 +40,34 @@ export const getUserById = async (
     const userToFind: string = req.params.id;
     const result = await userService.getUserById(user.id!, userToFind);
     res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const findUserByFullName = async (
+  req: TypedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user!;
+    const fullName: string = req.params.fullName as string; // Assicurati che fullName sia di tipo stringa
+    // const spaceIndex = fullName.indexOf(" ");
+    // const firstName =
+    //   spaceIndex !== -1 ? fullName.substring(0, spaceIndex) : fullName;
+    // const lastName =
+    //   spaceIndex !== -1 ? fullName.substring(spaceIndex + 1) : "";
+    const [firstName, ...rest] = fullName.split(" ");
+    const lastName = rest.join(" ");
+
+    const users = await userService.findUserByFullName(
+      user.id!,
+      firstName,
+      lastName
+    );
+    if (!users) throw new NotFoundError();
+    res.json(users);
   } catch (err) {
     next(err);
   }

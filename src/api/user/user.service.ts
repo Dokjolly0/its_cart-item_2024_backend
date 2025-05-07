@@ -6,6 +6,11 @@ import { User } from "./user.entity";
 import { UserModel } from "./user.model";
 import * as bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
+import dotenv from "dotenv";
+dotenv.config();
+
+let ADMIN_USER_NAME: string = process.env.ADMIN_USER_NAME!;
+if (!ADMIN_USER_NAME) ADMIN_USER_NAME = "admin";
 
 export class UserService {
   async add(
@@ -36,10 +41,23 @@ export class UserService {
     isAdmin: boolean = false
   ): Promise<User[]> {
     const isAuthenticated = await UserModel.findById(userId);
-    isAdmin = isAuthenticated?.role === "admin" ? true : false;
+    isAdmin = isAuthenticated?.role === ADMIN_USER_NAME ? true : false;
+
     if (!isAuthenticated || !isAdmin) throw new UnauthorizedError();
     const users = await UserModel.find();
+
     return users;
+  }
+
+  async getUserById(userId: string, userIdToFind: string) {
+    const isAuthenticated = await UserModel.findById(userId);
+    if (!isAuthenticated) throw new UnauthorizedError();
+
+    const user = await UserModel.findById(userIdToFind);
+    if (!user) throw new NotFoundError();
+    if (user.role === ADMIN_USER_NAME) throw new UnauthorizedError();
+
+    return user;
   }
 
   async findUserByFullName(
@@ -51,14 +69,6 @@ export class UserService {
     if (!isAuthenticated) throw new UnauthorizedError();
     const user = await UserModel.findOne({ firstName, lastName });
     if (!user) new NotFoundError();
-    return user;
-  }
-
-  async getUserById(userId: string, userIdToFind: string) {
-    const isAuthenticated = await UserModel.findById(userId);
-    if (!isAuthenticated) throw new UnauthorizedError();
-    const user = await UserModel.findById(userIdToFind);
-    if (!user) throw new NotFoundError();
     return user;
   }
 
