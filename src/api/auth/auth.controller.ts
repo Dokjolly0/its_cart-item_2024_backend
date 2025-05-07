@@ -14,6 +14,7 @@ import { verifyEmptyField } from "../../utils/verify-empty-field";
 import { userToFieldsInput } from "../user/user.utils";
 import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
+import { CustomError } from "../../errors/custom-error";
 
 dotenv.config();
 
@@ -100,6 +101,23 @@ export const add = async (
     if (ip) allowedIps.push(ip);
     const isActiveUser: boolean =
       IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
+
+    if (userBody.firstName || userBody.lastName) {
+      if (userBody.firstName.includes(" ")) {
+        throw new CustomError(
+          "InvalidNameError",
+          `The name '${userBody.firstName}' must not contain spaces.`,
+          400
+        );
+      }
+      if (userBody.lastName.includes(" ")) {
+        throw new CustomError(
+          "InvalidNameError",
+          `The last name '${userBody.lastName}' must not contain spaces.`,
+          400
+        );
+      }
+    }
 
     const userData: User = {
       ...userBody,

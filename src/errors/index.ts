@@ -6,12 +6,14 @@ import { emptyStringHandler } from "./empty-string";
 import { invalidArgumentTypeHandler } from "./invalid-argument-type";
 import { unauthorizedHandler } from "./unoutorized-error";
 import { userExistHandler } from "./user-exists";
+import { customHandler } from "./custom-error";
 
 export const errorHandlers = [
   unauthorizedHandler,
   notFoundHandler,
   validationErrorHandler,
   userExistHandler,
+  customHandler,
   dotenvHandler,
   emptyStringHandler,
   invalidArgumentTypeHandler,
