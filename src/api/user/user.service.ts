@@ -42,7 +42,6 @@ export class UserService {
   ): Promise<User[]> {
     const isAuthenticated = await UserModel.findById(userId);
     isAdmin = isAuthenticated?.role === ADMIN_USER_NAME ? true : false;
-
     if (!isAuthenticated || !isAdmin) throw new UnauthorizedError();
     const users = await UserModel.find();
 
@@ -55,7 +54,6 @@ export class UserService {
 
     const user = await UserModel.findById(userIdToFind);
     if (!user) throw new NotFoundError();
-    if (user.role === ADMIN_USER_NAME) throw new UnauthorizedError();
 
     return user;
   }
@@ -67,8 +65,10 @@ export class UserService {
   ) {
     const isAuthenticated = await UserModel.findById(userId);
     if (!isAuthenticated) throw new UnauthorizedError();
+
     const user = await UserModel.findOne({ firstName, lastName });
     if (!user) new NotFoundError();
+
     return user;
   }
 

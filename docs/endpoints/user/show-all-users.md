@@ -8,7 +8,7 @@
 
 ## Requisiti
 
-- Autenticarsi con un `admin user`, ovvero, l'utente come `role` deve avere `ADMIN_USER_NAME` impostato nel file `.env`
+- Deve essere `autenticato`, ovvero la propieta `role` dentro User deve essere uguale a `ADMIN_USER_NAME` impostato nel file `.env`, di default sarà `admin`
 
 ## Usi consigliati:
 
