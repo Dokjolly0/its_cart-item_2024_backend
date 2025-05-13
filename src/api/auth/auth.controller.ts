@@ -15,6 +15,7 @@ import { userToFieldsInput } from "../user/user.utils";
 import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
 import { CustomError } from "../../errors/custom-error";
+import { emailService } from "../../utils/services/email.service";
 
 dotenv.config();
 
@@ -129,8 +130,20 @@ export const add = async (
     };
     verifyEmptyField(userToFieldsInput(userData), EmptyStringError);
     const newUser = await userService.add(userData, credentials);
+    const confirmationCode = "";
+    let message = "User register succesfully.";
 
-    res.status(201).json(newUser);
+    if (!isActiveUser) {
+      emailService.sendConfirmationEmail(
+        credentials.username,
+        newUser.id!,
+        confirmationCode
+      );
+      message =
+        "User register succesfully, please check the email and confirm the email verification";
+    }
+
+    res.status(201).json({ newUser, message });
   } catch (err: any) {
     next(err);
   }
