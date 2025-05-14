@@ -26,6 +26,7 @@ export interface User {
   allowedIps?: string[] | undefined;
 
   // Token
+  confirmationToken?: string | undefined;
   resetPasswordToken?: string | undefined;
   resetPasswordExpires?: Date | string | undefined;
 

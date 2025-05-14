@@ -23,7 +23,14 @@ export class UserService {
     if (existingIdentity) throw new UserExistsError();
 
     const hashedPassword = await bcrypt.hash(credentials.password, 10);
-    const newUser = await UserModel.create(user);
+    const confirmationToken = uuidv4();
+
+    const newUser = await UserModel.create({
+      ...user,
+      confirmationToken,
+      isActive: false
+    });
+
     await UserIdentityModel.create({
       provider: "local",
       user: newUser.id,
@@ -32,6 +39,8 @@ export class UserService {
         hashedPassword,
       },
     });
+
+    console.log(newUser)
 
     return newUser;
   }

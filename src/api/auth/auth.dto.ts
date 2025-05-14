@@ -1,14 +1,10 @@
-import { Type } from "class-transformer";
 import {
   IsDateString,
   IsEmail,
   IsString,
   IsOptional,
   MinLength,
-  ValidateNested,
 } from "class-validator";
-import { AddressInfoDTO } from "../user/user.dto";
-import { IsValidAddressInfo } from "../../validators/IsValidAddressInfo";
 
 export class AddUserDTO {
   // Requested fields

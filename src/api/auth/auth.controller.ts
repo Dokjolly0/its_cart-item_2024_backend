@@ -130,14 +130,14 @@ export const add = async (
     };
     verifyEmptyField(userToFieldsInput(userData), EmptyStringError);
     const newUser = await userService.add(userData, credentials);
-    const confirmationCode = "";
     let message = "User register succesfully.";
+    console.log("Confirmation token: " + newUser.confirmationToken)
 
     if (!isActiveUser) {
       emailService.sendConfirmationEmail(
         credentials.username,
         newUser.id!,
-        confirmationCode
+        newUser.confirmationToken!
       );
       message =
         "User register succesfully, please check the email and confirm the email verification";

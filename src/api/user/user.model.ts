@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema<User>({
   lastAllowedIp: { type: String || undefined, default: undefined },
   allowedIps: { type: [String], default: [] },
 
+  confirmationToken: { type: String || undefined, default: undefined },
   resetPasswordToken: { type: String || undefined, default: undefined },
   resetPasswordExpires: {
     type: Date || String || undefined,
