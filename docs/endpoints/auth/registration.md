@@ -115,7 +115,7 @@ DotEnvError: Entity not found in dotenv
 - In assenza di alcuni campi opzionali, il server li imposta automaticamente a undefined o null.
 - In caso di errore di validazione, il server restituisce sempre HTTP status 400.
 
-## 🚀 Esempio Completo Registrazione (Successo)
+## 🚀 Esempio Completo Registrazione senza conferma email (Successo)
 
 _Body_:
 
@@ -133,12 +133,56 @@ _Risposta_:
 
 ```json
 {
+    "newUser": {
+        "firstName": "Pippo",
+        "lastName": "Pluto",
+        "isActive": false,
+        "role": "user",
+        "createdAt": "2025-05-14T12:49:12.906Z",
+        "lastAllowedIp": "0.0.0.0",
+        "allowedIps": [
+            "0.0.0.0"
+        ],
+        "confirmationToken": "token",
+        "fullName": "Pippo Pluto",
+        "id": "id"
+    },
+    "message": "User register succesfully."
+}
+```
+
+## 🚀 Esempio Completo Registrazione con conferma email (Successo)
+
+_Body_:
+
+```json
+{
   "firstName": "Mario",
   "lastName": "Rossi",
-  "role": "user",
-  "isActive": false,
-  "createdAt": "2025-04-27T13:04:58.183Z",
-  "fullName": "Mario Rossi",
-  "id": "680e2b7a6219265fc1f87b5b"
+  "username": "mario@rossi.it",
+  "password": "Password123",
+  "role": "user"
+}
+```
+
+_Risposta_:
+
+```json
+{
+    "newUser": {
+        "firstName": "Pippo",
+        "lastName": "Pluto",
+        "isActive": false,
+        "role": "user",
+        "createdAt": "2025-05-14T12:49:12.906Z",
+        "lastAllowedIp": "0.0.0.0",
+        "allowedIps": [
+            "0.0.0.0"
+        ],
+        "confirmationToken": "token",
+        "fullName": "Pippo Pluto",
+        "id": "id"
+    },
+    "message": "User register succesfully, please check the email and confirm the email verification."
 }
 ```

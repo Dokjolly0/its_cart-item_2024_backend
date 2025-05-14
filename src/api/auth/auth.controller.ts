@@ -140,7 +140,7 @@ export const add = async (
         newUser.confirmationToken!
       );
       message =
-        "User register succesfully, please check the email and confirm the email verification";
+        "User register succesfully, please check the email and confirm the email verification.";
     }
 
     res.status(201).json({ newUser, message });
