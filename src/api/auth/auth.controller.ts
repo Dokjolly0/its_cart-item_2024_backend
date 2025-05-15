@@ -97,41 +97,17 @@ export const add = async (
   try {
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
-    const ip: string | undefined = await getIP();
-    const allowedIps: string[] = [];
-    if (ip) allowedIps.push(ip);
     const isActiveUser: boolean =
       IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
 
-    if (userBody.firstName || userBody.lastName) {
-      if (userBody.firstName.includes(" ")) {
-        throw new CustomError(
-          "InvalidNameError",
-          `The name '${userBody.firstName}' must not contain spaces.`,
-          400
-        );
-      }
-      if (userBody.lastName.includes(" ")) {
-        throw new CustomError(
-          "InvalidNameError",
-          `The last name '${userBody.lastName}' must not contain spaces.`,
-          400
-        );
-      }
-    }
-
     const userData: User = {
       ...userBody,
-      lastAllowedIp: ip,
-      allowedIps: allowedIps,
       isActive: isActiveUser,
-      role: userBody.role ?? "user",
       createdAt: new Date(),
     };
-    verifyEmptyField(userToFieldsInput(userData), EmptyStringError);
+
     const newUser = await userService.add(userData, credentials);
     let message = "User register succesfully.";
-    console.log("Confirmation token: " + newUser.confirmationToken)
 
     if (!isActiveUser) {
       emailService.sendConfirmationEmail(

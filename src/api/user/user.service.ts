@@ -7,6 +7,11 @@ import { UserModel } from "./user.model";
 import * as bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
+import { CustomError } from "../../errors/custom-error";
+import { validateNameField, verifyEmptyField } from "../../utils/verify-empty-field";
+import { EmptyStringError } from "../../errors/empty-string";
+import { userToFieldsInput } from "./user.utils";
+import { getIP } from "../../utils/fetch-ip";
 dotenv.config();
 
 let ADMIN_USER_NAME: string = process.env.ADMIN_USER_NAME!;
@@ -17,18 +22,29 @@ export class UserService {
     user: User,
     credentials: { username: string; password: string }
   ): Promise<User> {
+    verifyEmptyField(userToFieldsInput(user), EmptyStringError);
     const existingIdentity = await UserIdentityModel.findOne({
       "credentials.username": credentials.username,
     });
+
     if (existingIdentity) throw new UserExistsError();
+    if (user.firstName || user.lastName) {
+      validateNameField(user.firstName, "first name");
+      validateNameField(user.lastName, "last name");
+    }
 
     const hashedPassword = await bcrypt.hash(credentials.password, 10);
     const confirmationToken = uuidv4();
+    const ip: string | undefined = await getIP();
+    const allowedIps: string[] = [];
+    if (ip) allowedIps.push(ip);
 
     const newUser = await UserModel.create({
       ...user,
       confirmationToken,
-      isActive: false
+      lastAllowedIp: ip,
+      allowedIps,
+      role: user.role ?? "user",
     });
 
     await UserIdentityModel.create({
@@ -39,8 +55,6 @@ export class UserService {
         hashedPassword,
       },
     });
-
-    console.log(newUser)
 
     return newUser;
   }

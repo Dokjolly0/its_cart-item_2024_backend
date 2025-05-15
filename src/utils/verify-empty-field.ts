@@ -1,4 +1,5 @@
 import { User } from "../api/user/user.entity";
+import { CustomError } from "../errors/custom-error";
 
 export type FieldsInput =
   | { name: string; value: unknown }[]
@@ -39,3 +40,13 @@ export const verifyEmptyField = (
 
   return emptyFields;
 };
+
+export function validateNameField(name, fieldName) {
+  if (name && name.includes(" ")) {
+    throw new CustomError(
+      "InvalidNameError",
+      `The ${fieldName} '${name}' must not contain spaces.`,
+      400
+    );
+  }
+}
