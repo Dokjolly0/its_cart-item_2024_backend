@@ -43,14 +43,24 @@ export class UserService {
     const ip: string | undefined = await getIP();
     const allowedIps: string[] = [];
     if (ip) allowedIps.push(ip);
+    const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars(
+      "IS_REQUIRED_EMAIL_VERIFICATION"
+    );
+    const isActive: boolean =
+      IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
+    console.log("IsActive: " + isActive);
 
-    const newUser = await UserModel.create({
+    const newUser: User = await UserModel.create({
       ...user,
-      confirmationToken,
       lastAllowedIp: ip,
       allowedIps,
+      isActive: isActive,
       role: user.role ?? "user",
+      confirmationToken,
+      createdAt: new Date(),
     });
+
+    console.log(newUser);
 
     await UserIdentityModel.create({
       provider: "local",

@@ -12,12 +12,10 @@ import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
 import { emailService } from "../../utils/services/email.service";
 
-const [JWT_SECRET, EXPIRED_IN_JWT, IS_REQUIRED_EMAIL_VERIFICATION] =
-  requireEnvVars([
-    "JWT_SECRET",
-    "EXPIRED_IN_JWT",
-    "IS_REQUIRED_EMAIL_VERIFICATION",
-  ]);
+const [JWT_SECRET, EXPIRED_IN_JWT] = requireEnvVars([
+  "JWT_SECRET",
+  "EXPIRED_IN_JWT",
+]);
 
 export const login = async (
   req: TypedRequest,
@@ -63,8 +61,6 @@ export const login = async (
           userTmp.lastAllowedIp = ip;
         }
 
-        console.log(userTmp);
-
         const token = jwt.sign(user, JWT_SECRET, { expiresIn: EXPIRED_IN_JWT });
 
         res.status(200);
@@ -89,26 +85,18 @@ export const add = async (
   try {
     const userBody = omit(req.body, "username", "password");
     const credentials = pick(req.body, "username", "password");
-    const isActiveUser: boolean =
-      IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
 
-    const userData: User = {
-      ...userBody,
-      isActive: isActiveUser,
-      createdAt: new Date(),
-    };
-
-    const newUser = await userService.add(userData, credentials);
+    const newUser = await userService.add(userBody, credentials);
     let message = "User register succesfully.";
 
-    if (!isActiveUser) {
+    if (!newUser.isActive) {
       emailService.sendConfirmationEmail(
         credentials.username,
         newUser.id!,
         newUser.confirmationToken!
       );
       message =
-        "User register succesfully, please check the email and confirm the email verification.";
+        "User add succesfully, please check the email and confirm the email verification.";
     }
 
     res.status(201).json({ newUser, message });

@@ -14,12 +14,12 @@ export interface User {
   timeZone?: string | undefined;
 
   // Authentication Info
-  isActive: boolean;
+  isActive?: boolean;
   status?: string | undefined;
   role: string;
 
   // Security Info
-  createdAt: Date | string;
+  createdAt?: Date | string;
   lastUpdateAt?: Date | string | undefined;
   lastLogin?: Date | string | undefined;
   lastAllowedIp?: string | undefined;
