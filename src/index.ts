@@ -3,14 +3,13 @@ import "reflect-metadata";
 import mongoose from "mongoose";
 
 import app from "./app";
-import { DotEnvError } from "./errors/dotenv";
+import { requireEnvVars } from "./utils/dotenv";
 
-const MONGO_URI = process.env.MONGO_URI;
-if (!MONGO_URI) throw new DotEnvError();
-const DB_NAME = process.env.DB_NAME;
-if (!DB_NAME) throw new DotEnvError();
-const PORT = process.env.PORT;
-if (!PORT) throw new DotEnvError();
+const [MONGO_URI, DB_NAME, PORT] = requireEnvVars([
+  "MONGO_URI",
+  "DB_NAME",
+  "PORT",
+]);
 
 mongoose.set("debug", true);
 mongoose

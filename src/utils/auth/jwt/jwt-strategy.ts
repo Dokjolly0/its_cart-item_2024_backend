@@ -2,10 +2,9 @@ import "dotenv/config";
 import passport from "passport";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { UserModel } from "../../../api/user/user.model";
-import { DotEnvError } from "../../../errors/dotenv";
+import { requireEnvVars } from "../../../utils/dotenv";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new DotEnvError();
+const JWT_SECRET = requireEnvVars("JWT_SECRET");
 
 passport.use(
   new JwtStrategy(

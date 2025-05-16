@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
 export class DotEnvError extends Error {
-  constructor() {
+  constructor(entity?: string) {
     super("Entity not found in dotenv");
     this.name = "DotEnvError";
-    this.message = "Entity not found in dotenv";
+    this.message = `Entity ${entity} not found in dotenv`;
   }
 }
 

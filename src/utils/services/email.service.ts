@@ -1,27 +1,25 @@
 import "dotenv/config";
 import nodemailer from "nodemailer";
 import { registrationEmailTemplate } from "../email.template";
-import { DotEnvError } from "../../errors/dotenv";
+import { notThrowDotEnvError, requireEnvVars } from "../../utils/dotenv";
 
-const SERVER_URI = process.env.SERVER_URI;
-if (!SERVER_URI) throw new DotEnvError();
-
-const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER;
-if (!EMAIL_PROVIDER) throw new DotEnvError();
-const EMAIL_SENDER = process.env.EMAIL_SENDER;
-if (!EMAIL_SENDER) throw new DotEnvError();
-const EMAIL_SENDER_PASSWORD = process.env.EMAIL_SENDER_PASSWORD;
-if (!EMAIL_SENDER_PASSWORD) throw new DotEnvError();
+const [SERVER_URI, EMAIL_PROVIDER, EMAIL_SENDER, EMAIL_SENDER_PASSWORD] =
+  requireEnvVars([
+    "SERVER_URI",
+    "EMAIL_PROVIDER",
+    "EMAIL_SENDER",
+    "EMAIL_SENDER_PASSWORD",
+  ]);
 
 // Aruba settings
 const isGmail = EMAIL_PROVIDER!.toLowerCase() === "gmail";
-const EMAIL_HOST = process.env.EMAIL_HOST;
-const EMAIL_PORT = process.env.EMAIL_PORT;
-const EMAIL_SECURE = process.env.EMAIL_SECURE === "true";
+
+const [EMAIL_HOST, EMAIL_PORT, EMAIL_SECURE] = requireEnvVars(
+  ["EMAIL_HOST", "EMAIL_PORT", "EMAIL_SECURE"],
+  notThrowDotEnvError
+);
 if (isGmail) {
-  if (!EMAIL_HOST) throw new DotEnvError();
-  if (!EMAIL_PORT) throw new DotEnvError();
-  if (EMAIL_SECURE === undefined) throw new DotEnvError();
+  requireEnvVars(["EMAIL_HOST", "EMAIL_PORT", "EMAIL_SECURE"]);
 }
 
 export class EmailService {

@@ -1,29 +1,23 @@
+import "dotenv/config";
 import { NextFunction, Response } from "express";
 import { TypedRequest } from "../../utils/typed-request";
 import userService from "../user/user.service";
 import { AddUserDTO } from "./auth.dto";
 import { omit, pick } from "lodash";
-import { UserExistsError } from "../../errors/user-exists";
 import passport, { use } from "passport";
 import * as jwt from "jsonwebtoken";
-import "dotenv/config";
-import { DotEnvError } from "../../errors/dotenv";
+import { requireEnvVars } from "../../utils/dotenv";
 import { User } from "../user/user.entity";
-import { EmptyStringError } from "../../errors/empty-string";
-import { verifyEmptyField } from "../../utils/verify-empty-field";
-import { userToFieldsInput } from "../user/user.utils";
 import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
-import { CustomError } from "../../errors/custom-error";
 import { emailService } from "../../utils/services/email.service";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new DotEnvError();
-const EXPIRED_IN_JWT = process.env.EXPIRED_IN_JWT;
-if (!EXPIRED_IN_JWT) throw new DotEnvError();
-const IS_REQUIRED_EMAIL_VERIFICATION =
-  process.env.IS_REQUIRED_EMAIL_VERIFICATION;
-if (!IS_REQUIRED_EMAIL_VERIFICATION) throw new DotEnvError();
+const [JWT_SECRET, EXPIRED_IN_JWT, IS_REQUIRED_EMAIL_VERIFICATION] =
+  requireEnvVars([
+    "JWT_SECRET",
+    "EXPIRED_IN_JWT",
+    "IS_REQUIRED_EMAIL_VERIFICATION",
+  ]);
 
 export const login = async (
   req: TypedRequest,

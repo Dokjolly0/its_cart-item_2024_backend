@@ -14,8 +14,12 @@ import {
 import { EmptyStringError } from "../../errors/empty-string";
 import { userToFieldsInput } from "./user.utils";
 import { getIP } from "../../utils/fetch-ip";
+import { notThrowDotEnvError, requireEnvVars } from "../../utils/dotenv";
 
-let ADMIN_USER_NAME: string = process.env.ADMIN_USER_NAME!;
+let ADMIN_USER_NAME: string | undefined = requireEnvVars(
+  "ADMIN_USER_NAME",
+  notThrowDotEnvError
+);
 if (!ADMIN_USER_NAME) ADMIN_USER_NAME = "admin";
 
 export class UserService {
