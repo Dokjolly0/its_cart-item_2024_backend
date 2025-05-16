@@ -6,13 +6,14 @@ import { User } from "./user.entity";
 import { UserModel } from "./user.model";
 import * as bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
-import dotenv from "dotenv";
-import { CustomError } from "../../errors/custom-error";
-import { validateNameField, verifyEmptyField } from "../../utils/verify-empty-field";
+import "dotenv/config";
+import {
+  validateNameField,
+  verifyEmptyField,
+} from "../../utils/verify-empty-field";
 import { EmptyStringError } from "../../errors/empty-string";
 import { userToFieldsInput } from "./user.utils";
 import { getIP } from "../../utils/fetch-ip";
-dotenv.config();
 
 let ADMIN_USER_NAME: string = process.env.ADMIN_USER_NAME!;
 if (!ADMIN_USER_NAME) ADMIN_USER_NAME = "admin";

@@ -1,9 +1,8 @@
+import "dotenv/config";
 import nodemailer from "nodemailer";
 import { registrationEmailTemplate } from "../email.template";
-import dotenv from "dotenv";
 import { DotEnvError } from "../../errors/dotenv";
 
-dotenv.config();
 const SERVER_URI = process.env.SERVER_URI;
 if (!SERVER_URI) throw new DotEnvError();
 

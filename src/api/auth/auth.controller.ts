@@ -6,7 +6,7 @@ import { omit, pick } from "lodash";
 import { UserExistsError } from "../../errors/user-exists";
 import passport, { use } from "passport";
 import * as jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import "dotenv/config";
 import { DotEnvError } from "../../errors/dotenv";
 import { User } from "../user/user.entity";
 import { EmptyStringError } from "../../errors/empty-string";
@@ -16,8 +16,6 @@ import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
 import { CustomError } from "../../errors/custom-error";
 import { emailService } from "../../utils/services/email.service";
-
-dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new DotEnvError();
