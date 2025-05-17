@@ -25,11 +25,6 @@ export interface User {
   lastAllowedIp?: string | undefined;
   allowedIps?: string[] | undefined;
 
-  // Token
-  confirmationToken?: string | undefined;
-  resetPasswordToken?: string | undefined;
-  resetPasswordExpires?: Date | string | undefined;
-
   // Address Info
   addressInfo?: {
     address: string | undefined;

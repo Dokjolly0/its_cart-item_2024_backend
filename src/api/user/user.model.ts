@@ -37,13 +37,6 @@ const userSchema = new mongoose.Schema<User>({
   lastLogin: { type: Date, default: undefined },
   lastAllowedIp: { type: String || undefined, default: undefined },
   allowedIps: { type: [String], default: [] },
-
-  confirmationToken: { type: String || undefined, default: undefined },
-  resetPasswordToken: { type: String || undefined, default: undefined },
-  resetPasswordExpires: {
-    type: Date || String || undefined,
-    default: undefined,
-  },
 });
 
 userSchema.virtual("fullName").get(function () {
