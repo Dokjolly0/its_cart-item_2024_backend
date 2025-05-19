@@ -1,22 +1,21 @@
-
 # 🧑‍💻 User API Endpoint
 
-**Base URL**: `http://localhost:3000/api/users/`  
-(*Nota: la porta può essere modificata tramite `SERVER_URI` nel file `.env`*)
+## 📍 Endpoint: GET `http://localhost:PORT/users/find/:id`
 
----
-
-## 📍 Endpoint: GET `/find/:id`
+- `PORT` deve essere specificato nel file .env.
 
 ### 🔐 Autenticazione: Richiesta (Bearer Token)
 
 ### 📝 Descrizione:
+
 Recupera un utente specifico tramite il suo ID.
 
 ### 🔄 Parametri URL:
+
 - `id`: ID dell'utente da cercare
 
 ### ✅ Risposta di Successo:
+
 ```json
 {
   "id": "user_id",
@@ -27,5 +26,6 @@ Recupera un utente specifico tramite il suo ID.
 ```
 
 ### ❌ Possibili Errori:
+
 - `401 Unauthorized` se non autenticato
 - `404 Not Found` se l'utente non esiste
