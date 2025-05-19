@@ -36,12 +36,7 @@ export const getUserById = async (req: TypedRequest, res: Response, next: NextFu
 export const findUserByFullName = async (req: TypedRequest, res: Response, next: NextFunction) => {
   try {
     const user = req.user!;
-    const fullName: string = req.params.fullName as string; // Assicurati che fullName sia di tipo stringa
-    // const spaceIndex = fullName.indexOf(" ");
-    // const firstName =
-    //   spaceIndex !== -1 ? fullName.substring(0, spaceIndex) : fullName;
-    // const lastName =
-    //   spaceIndex !== -1 ? fullName.substring(spaceIndex + 1) : "";
+    const fullName: string = req.params.fullName as string;
     const [firstName, ...rest] = fullName.split(" ");
     const lastName = rest.join(" ");
 
