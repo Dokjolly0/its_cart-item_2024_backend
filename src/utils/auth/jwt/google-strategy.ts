@@ -4,6 +4,7 @@ import { UserModel } from "../../../api/user/user.model";
 import { UserIdentityModel } from "../local/user-identity.model";
 import { v4 as uuidv4 } from "uuid";
 import { requireEnvVars } from "../../dotenv";
+import { getIP } from "../../fetch-ip";
 
 const [GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL] = requireEnvVars([
   "GOOGLE_CLIENT_ID",
@@ -20,6 +21,9 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        const ip: string | undefined = await getIP();
+        const allowedIps: string[] = [];
+        if (ip) allowedIps.push(ip);
         const email = profile.emails?.[0].value;
         if (!email) return done(null, false);
 
@@ -34,6 +38,8 @@ passport.use(
             picture: profile.photos?.[0]?.value,
             isActive: true,
             role: "user",
+            lastAllowedIp: ip,
+            allowedIps: allowedIps,
             createdAt: new Date(),
           });
 

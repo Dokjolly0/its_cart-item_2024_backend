@@ -1,4 +1,5 @@
 import "./jwt/jwt-strategy";
+import "./jwt/github-strategy";
 import "./jwt/google-strategy";
 import "./local/local-strategy";
 

@@ -10,7 +10,11 @@ import { requireEnvVars } from "../../utils/dotenv";
 import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
 
-const [JWT_SECRET, EXPIRED_IN_JWT] = requireEnvVars(["JWT_SECRET", "EXPIRED_IN_JWT"]);
+const [JWT_SECRET, EXPIRED_IN_JWT, FRONTEND_URL] = requireEnvVars([
+  "JWT_SECRET",
+  "EXPIRED_IN_JWT",
+  "FRONTEND_URL",
+]);
 
 export const login = async (req: TypedRequest, res: Response, next: NextFunction) => {
   try {
@@ -82,7 +86,7 @@ export const add = async (req: TypedRequest<AddUserDTO>, res: Response, next: Ne
   }
 };
 
-export const handleGoogleAuth = async (req: TypedRequest, res: Response, next: NextFunction) => {
+export const handleOAuthAuth = async (req: TypedRequest, res: Response, next: NextFunction) => {
   try {
     const user = req.user as any;
     const token = jwt.sign({ id: user._id }, JWT_SECRET, {
@@ -90,13 +94,11 @@ export const handleGoogleAuth = async (req: TypedRequest, res: Response, next: N
     });
 
     // Reindirizza il frontend con il token
-    res.redirect(`${process.env.FRONTEND_URL}/login-success?token=${token}`);
+    res.redirect(`${FRONTEND_URL}/login-success?token=${token}`);
   } catch (err: any) {
-    next(err)
+    next(err);
   }
-}
-
-
+};
 
 export const confirmEmail = async (req: TypedRequest, res: Response, next: NextFunction) => {
   try {
