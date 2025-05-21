@@ -5,6 +5,7 @@ import { UserIdentityModel } from "../local/user-identity.model";
 import { v4 as uuidv4 } from "uuid";
 import { requireEnvVars } from "../../dotenv";
 import { getIP } from "../../fetch-ip";
+import { emailService } from "../../services/email.service";
 
 const [CLIENT_ID, CLIENT_SECRET, CALLBACK_URL] = requireEnvVars([
   "GITHUB_CLIENT_ID",
@@ -26,6 +27,10 @@ passport.use(
       const allowedIps: string[] = [];
       if (ip) allowedIps.push(ip);
 
+      const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars("IS_REQUIRED_EMAIL_VERIFICATION");
+      const isActive: boolean = IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
+      const confirmationToken = uuidv4();
+
       let user = await UserModel.findOne({ username: email });
       if (!user) {
         user = await UserModel.create({
@@ -33,7 +38,7 @@ passport.use(
           firstName: profile.displayName?.split(" ")[0] || profile.username,
           lastName: profile.displayName?.split(" ")[1] || "",
           picture: profile.photos?.[0]?.value,
-          isActive: true,
+          isActive: isActive,
           lastAllowedIp: ip,
           allowedIps: allowedIps,
           role: "user",
@@ -47,6 +52,10 @@ passport.use(
             hashedPassword: uuidv4(), // Unused
           },
         });
+
+        if (!user.isActive) {
+          emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+        }
       }
 
       return done(null, user.toObject());

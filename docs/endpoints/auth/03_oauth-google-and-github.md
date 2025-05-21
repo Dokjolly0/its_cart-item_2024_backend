@@ -4,13 +4,15 @@
 
 ### 🌐 GitHub OAuth
 
-- **URL**: `http://localhost:3000/api/auth/github`
+- **URL**: `http://localhost:PORT/api/auth/github`
+- L'attributo `PORT` è configurabile nel file `.env`.
 - Il client sarà reindirizzato a GitHub per l'autenticazione.
 - Al termine, GitHub reindirizzerà al callback configurato (`GITHUB_CALLBACK_URL`) con un token.
 
 ### 🌐 Google OAuth
 
-- **URL**: `http://localhost:3000/api/auth/google`
+- **URL**: `http://localhost:PORT/api/auth/google`
+- L'attributo `PORT` è configurabile nel file `.env`.
 - Il client sarà reindirizzato a Google per l'autenticazione.
 - Al termine, Google reindirizzerà al callback configurato (`GOOGLE_CALLBACK_URL`) con un token.
 
@@ -22,15 +24,15 @@ Assicurati di avere i seguenti valori nel file `.env`:
 # GOOGLE
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
-GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
+GOOGLE_CALLBACK_URL=http://localhost:PORT/api/auth/google/callback
 
 # GITHUB
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
-GITHUB_CALLBACK_URL=http://localhost:3000/api/auth/github/callback
+GITHUB_CALLBACK_URL=http://localhost:PORT/api/auth/github/callback
 
 # GENERALI
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:5000
 JWT_SECRET=una_stringa_sicura
 EXPIRED_IN_JWT=7d
 ```
@@ -53,10 +55,10 @@ Se l’utente esiste già (`username` corrispondente all’email), viene utilizz
 - `username`: email
 - `picture`: URL della foto del profilo
 - `role`: `"user"`
-- `isActive`: `true`
-- `allowedIps`: IP del client che effettua l’accesso
-
-Un record corrispondente viene creato anche in `UserIdentityModel` con:
+- `isActive`: -> Dipende da `IS_REQUIRED_EMAIL_VERIFICATION` inpostato nel file `.env`
+- `lastAllowedIplastAllowedIp`: IP del client che effettua l’accesso
+- `allowedIps`: array contenente l’IP del client che effettua l’accesso
+  Un record corrispondente viene creato anche in `UserIdentityModel` con:
 
 - `provider`: `"google"` o `"github"`
 - `credentials.username`: email dell’utente
