@@ -6,12 +6,15 @@ import { v4 as uuidv4 } from "uuid";
 import { requireEnvVars } from "../../dotenv";
 import { getIP } from "../../fetch-ip";
 import { emailService } from "../../services/email.service";
+import { isValidResendEmail } from "../local/local-strategy";
 
 const [CLIENT_ID, CLIENT_SECRET, CALLBACK_URL] = requireEnvVars([
   "GITHUB_CLIENT_ID",
   "GITHUB_CLIENT_SECRET",
   "GITHUB_CALLBACK_URL",
 ]);
+
+const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars("IS_REQUIRED_EMAIL_VERIFICATION") === "true";
 
 passport.use(
   new GitHubStrategy(
@@ -22,43 +25,62 @@ passport.use(
       scope: ["user:email"],
     },
     async (accessToken, refreshToken, profile, done) => {
-      const email = profile.emails?.[0]?.value || `${profile.username}@github.com`;
-      const ip: string | undefined = await getIP();
-      const allowedIps: string[] = [];
-      if (ip) allowedIps.push(ip);
+      try {
+        const email = profile.emails?.[0]?.value || `${profile.username}@github.com`;
+        const ip = await getIP();
+        const allowedIps = ip ? [ip] : [];
+        const isActive = !IS_REQUIRED_EMAIL_VERIFICATION;
 
-      const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars("IS_REQUIRED_EMAIL_VERIFICATION");
-      const isActive: boolean = IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
-      const confirmationToken = uuidv4();
+        let user;
+        let userIdentity = await UserIdentityModel.findOne({ "credentials.username": email });
+        const confirmationToken = uuidv4();
 
-      let user = await UserModel.findOne({ username: email });
-      if (!user) {
-        user = await UserModel.create({
-          username: email,
-          firstName: profile.displayName?.split(" ")[0] || profile.username,
-          lastName: profile.displayName?.split(" ")[1] || "",
-          picture: profile.photos?.[0]?.value,
-          isActive: isActive,
-          lastAllowedIp: ip,
-          allowedIps: allowedIps,
-          role: "user",
-        });
+        if (!userIdentity) {
+          // Crea utente e userIdentity
+          const [firstName, lastName] = (profile.displayName || profile.username).split(" ");
 
-        await UserIdentityModel.create({
-          provider: "github",
-          user: user._id,
-          credentials: {
+          user = await UserModel.create({
             username: email,
-            hashedPassword: uuidv4(), // Unused
-          },
-        });
+            firstName: firstName || "",
+            lastName: lastName || "",
+            picture: profile.photos?.[0]?.value,
+            lastAllowedIp: ip,
+            allowedIps,
+            role: "user",
+          });
 
-        if (!user.isActive) {
-          emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+          userIdentity = await UserIdentityModel.create({
+            provider: "github",
+            user: user._id,
+            credentials: {
+              username: email,
+              hashedPassword: uuidv4(),
+            },
+            isActive,
+            confirmationToken,
+            emailConfirmationSentAt: isActive ? null : new Date(),
+          });
+
+          if (!isActive) {
+            await emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+          }
+        } else {
+          user = userIdentity.user;
+
+          if (!userIdentity.isActive && userIdentity.emailConfirmationSentAt) {
+            const shouldResend = isValidResendEmail(userIdentity.emailConfirmationSentAt);
+            if (shouldResend) {
+              await emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+              userIdentity.emailConfirmationSentAt = new Date();
+              await userIdentity.save();
+            }
+          }
         }
-      }
 
-      return done(null, user.toObject());
+        return done(null, user.toObject());
+      } catch (err) {
+        return done(err, null);
+      }
     }
   )
 );

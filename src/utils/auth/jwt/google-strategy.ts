@@ -6,12 +6,15 @@ import { v4 as uuidv4 } from "uuid";
 import { requireEnvVars } from "../../dotenv";
 import { getIP } from "../../fetch-ip";
 import { emailService } from "../../services/email.service";
+import { isValidResendEmail } from "../local/local-strategy";
 
 const [GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL] = requireEnvVars([
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "GOOGLE_CALLBACK_URL",
 ]);
+
+const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars("IS_REQUIRED_EMAIL_VERIFICATION") === "true";
 
 passport.use(
   new GoogleStrategy(
@@ -22,43 +25,54 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const ip: string | undefined = await getIP();
-        const allowedIps: string[] = [];
-        if (ip) allowedIps.push(ip);
-        const email = profile.emails?.[0].value;
-        if (!email) return done(null, false);
+        const email = profile.emails?.[0]?.value || `${profile.username}@github.com`;
+        const ip = await getIP();
+        const allowedIps = ip ? [ip] : [];
+        const isActive = !IS_REQUIRED_EMAIL_VERIFICATION;
 
-        const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars("IS_REQUIRED_EMAIL_VERIFICATION");
-        const isActive: boolean = IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
+        let user;
+        let userIdentity = await UserIdentityModel.findOne({ "credentials.username": email });
         const confirmationToken = uuidv4();
 
-        let user = await UserModel.findOne({ username: email });
+        if (!userIdentity) {
+          // Crea utente e userIdentity
+          const [firstName, lastName] = (profile.displayName || profile.username).split(" ");
 
-        if (!user) {
-          // Crea un nuovo utente
           user = await UserModel.create({
             username: email,
-            firstName: profile.name?.givenName || "",
-            lastName: profile.name?.familyName || "",
+            firstName: firstName || "",
+            lastName: lastName || "",
             picture: profile.photos?.[0]?.value,
-            isActive: isActive,
-            role: "user",
             lastAllowedIp: ip,
-            allowedIps: allowedIps,
-            createdAt: new Date(),
+            allowedIps,
+            role: "user",
           });
 
-          await UserIdentityModel.create({
+          userIdentity = await UserIdentityModel.create({
             provider: "google",
             user: user._id,
             credentials: {
               username: email,
-              hashedPassword: uuidv4(), // Non usato, solo segnaposto
+              hashedPassword: uuidv4(),
             },
+            isActive,
+            confirmationToken,
+            emailConfirmationSentAt: isActive ? null : new Date(),
           });
 
-          if (!user.isActive) {
-            emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+          if (!isActive) {
+            await emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+          }
+        } else {
+          user = userIdentity.user;
+
+          if (!userIdentity.isActive && userIdentity.emailConfirmationSentAt) {
+            const shouldResend = isValidResendEmail(userIdentity.emailConfirmationSentAt);
+            if (shouldResend) {
+              await emailService.sendConfirmationEmail(email, user.id!, confirmationToken);
+              userIdentity.emailConfirmationSentAt = new Date();
+              await userIdentity.save();
+            }
           }
         }
 

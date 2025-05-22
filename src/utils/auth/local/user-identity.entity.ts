@@ -10,6 +10,8 @@ export interface UserIdentity {
   user: User;
 
   // Token
+  isActive: boolean;
+  emailConfirmationSentAt?: Date;
   confirmationToken?: string | undefined;
   resetPasswordToken?: string | undefined | null;
   resetPasswordExpires?: Date | string | undefined | null;

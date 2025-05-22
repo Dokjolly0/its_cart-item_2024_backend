@@ -26,8 +26,7 @@ const userSchema = new mongoose.Schema<User>({
   timeZone: { type: String || undefined, default: undefined },
   addressInfo: addressInfo,
 
-  // Stato Utente
-  isActive: { type: Boolean, default: false },
+  // Stato
   role: { type: String, default: "user" },
   status: { type: String || undefined, default: undefined },
 
