@@ -39,29 +39,30 @@ export class UserService {
     if (ip) allowedIps.push(ip);
     const IS_REQUIRED_EMAIL_VERIFICATION = requireEnvVars("IS_REQUIRED_EMAIL_VERIFICATION");
     const isActive: boolean = IS_REQUIRED_EMAIL_VERIFICATION === "true" ? false : true;
+    console.log(isActive);
 
     const newUser: User = await UserModel.create({
       ...user,
       lastAllowedIp: ip,
       allowedIps,
-      isActive: isActive,
       role: user.role ?? "user",
       createdAt: new Date(),
     });
 
-    if (!newUser.isActive) {
-      emailService.sendConfirmationEmail(credentials.username, newUser.id!, confirmationToken);
-    }
-
-    await UserIdentityModel.create({
+    const userIdentity = await UserIdentityModel.create({
       provider: "local",
       user: newUser.id,
       credentials: {
         username: credentials.username,
         hashedPassword,
       },
+      isActive,
       confirmationToken: confirmationToken,
     });
+
+    if (!userIdentity.isActive) {
+      emailService.sendConfirmationEmail(credentials.username, newUser.id!, confirmationToken);
+    }
 
     return newUser;
   }
@@ -81,6 +82,10 @@ export class UserService {
     const user = await UserModel.findById(userIdToFind);
     if (!user) throw new NotFoundError();
     return user;
+  }
+
+  async getUserIdentityByUserId(userId: string) {
+    return await UserIdentityModel.findOne({ user: userId });
   }
 
   async findUserByFullName(userId: string, firstName: string, lastName: string) {
@@ -117,16 +122,13 @@ export class UserService {
   }
 
   async verifyConfirmationToken(userId: string, confirmationToken: string) {
-    const user = await UserModel.findById(userId);
     const identity = await UserIdentityModel.findOne({
       user: userId,
     });
-    console.log(`Identity: ${identity}`);
-    console.log(`Token: ${confirmationToken}`);
-    if (user && identity && identity.confirmationToken === confirmationToken) {
-      user.isActive = true;
+    if (identity && identity.confirmationToken === confirmationToken) {
+      identity.isActive = true;
       identity.confirmationToken = undefined;
-      await user.save();
+      await identity.save();
       return true;
     }
     return false;

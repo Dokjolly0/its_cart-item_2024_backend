@@ -9,6 +9,8 @@ import * as jwt from "jsonwebtoken";
 import { requireEnvVars } from "../../utils/dotenv";
 import { getIP } from "../../utils/fetch-ip";
 import { UserModel } from "../user/user.model";
+import { UnauthorizedError } from "../../errors/unoutorized-error";
+import { CustomError } from "../../errors/custom-error";
 
 const [JWT_SECRET, EXPIRED_IN_JWT, FRONTEND_URL] = requireEnvVars([
   "JWT_SECRET",
@@ -33,7 +35,9 @@ export const login = async (req: TypedRequest, res: Response, next: NextFunction
         return;
       }
 
-      if (!user.isActive) {
+      const identity = await userService.getUserIdentityByUserId(user.id);
+
+      if (identity && !identity.isActive) {
         res.status(400).json({
           error: "LoginError",
           message: "Account non attivato. Controlla la tua casella mail per confermare la registrazione.",
@@ -46,11 +50,11 @@ export const login = async (req: TypedRequest, res: Response, next: NextFunction
       if (userTmp) {
         if (ip && userTmp.allowedIps && !userTmp.allowedIps.includes(ip)) {
           userTmp.allowedIps.push(ip);
-          await userTmp.save();
         }
         userTmp.lastLogin = new Date();
         userTmp.lastUpdateAt = new Date();
         userTmp.lastAllowedIp = ip;
+        await userTmp.save();
       }
 
       const token = jwt.sign(user, JWT_SECRET, { expiresIn: EXPIRED_IN_JWT });
@@ -74,9 +78,10 @@ export const add = async (req: TypedRequest<AddUserDTO>, res: Response, next: Ne
     const credentials = pick(req.body, "username", "password");
 
     const newUser = await userService.add(userBody, credentials);
+    const identity = await userService.getUserIdentityByUserId(newUser.id!);
 
     let message = "User register succesfully.";
-    if (!newUser.isActive) {
+    if (identity && !identity.isActive) {
       message = "User add succesfully, please check the email and confirm the email verification.";
     }
 
@@ -89,6 +94,16 @@ export const add = async (req: TypedRequest<AddUserDTO>, res: Response, next: Ne
 export const handleOAuthAuth = async (req: TypedRequest, res: Response, next: NextFunction) => {
   try {
     const user = req.user as any;
+    const identity = await userService.getUserIdentityByUserId(user.id);
+
+    if (identity && !identity.isActive) {
+      throw new CustomError(
+        "EmailConfirmationRequired",
+        "Per favore conferma la tua email prima di accedere.",
+        401
+      );
+    }
+
     const token = jwt.sign({ id: user._id }, JWT_SECRET, {
       expiresIn: EXPIRED_IN_JWT,
     });

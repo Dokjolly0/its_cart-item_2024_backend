@@ -20,10 +20,7 @@ passport.use(
             message: `username ${username} not found`,
           });
         }
-        const match = await bcrypt.compare(
-          password,
-          identity.credentials.hashedPassword
-        );
+        const match = await bcrypt.compare(password, identity.credentials.hashedPassword);
         if (match) {
           return done(null, identity.toObject().user);
         }
@@ -34,3 +31,13 @@ passport.use(
     }
   )
 );
+
+export function isValidResendEmail(lastSent: Date) {
+  const now = new Date();
+  const oneHour = 1000 * 60 * 60;
+
+  if (!lastSent || now.getTime() - new Date(lastSent).getTime() > oneHour) {
+    return true;
+  }
+  return false;
+}

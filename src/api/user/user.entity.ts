@@ -14,7 +14,6 @@ export interface User {
   timeZone?: string | undefined;
 
   // Authentication Info
-  isActive?: boolean;
   status?: string | undefined;
   role: string;
 

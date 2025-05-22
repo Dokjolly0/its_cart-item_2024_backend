@@ -12,6 +12,8 @@ const userIdentitySchema = new mongoose.Schema<UserIdentity>({
   user: { type: Schema.Types.ObjectId, ref: "User" },
 
   // Token
+  isActive: { type: Boolean, default: false },
+  emailConfirmationSentAt: { type: Date, default: null },
   confirmationToken: { type: String || undefined || null, default: undefined },
   resetPasswordToken: { type: String || undefined || null, default: undefined },
   resetPasswordExpires: {
