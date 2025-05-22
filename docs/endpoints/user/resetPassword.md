@@ -3,6 +3,7 @@
 ## 📍 Endpoint: POST `http://localhost:PORT/users/reset-password`
 
 - `PORT` deve essere specificato nel file .env.
+- `Authentication`: `Bearer token
 
 ### 🔐 Autenticazione: Richiesta
 

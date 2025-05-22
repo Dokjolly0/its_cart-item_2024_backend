@@ -7,8 +7,8 @@ const router = express.Router();
 router.get("/me", isAuthenticated, me);
 router.get("/users", isAuthenticated, showAllUsers);
 router.get("/find/:id", isAuthenticated, getUserById);
-router.post("/reset-password", resetPassword); // Reimposta la password
-router.get("/validate-password/:oldPassword", validatePassword);
+router.post("/reset-password", isAuthenticated, resetPassword); // Reimposta la password
+router.get("/validate-password/:oldPassword", isAuthenticated, validatePassword);
 router.get("/picture", picture);
 
 export default router;

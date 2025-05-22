@@ -21,15 +21,16 @@ _Risposta_:
 ```json
 [
   {
-    "firstName": "Pippo",
-    "lastName": "Pluto",
-    "isActive": true,
-    "role": "admin",
-    "createdAt": "2025-05-07T19:45:30.819Z",
+    "firstName": "Alex",
+    "lastName": "Violatto",
+    "role": "user",
+    "createdAt": "2025-05-22T10:49:31.263Z",
     "lastAllowedIp": "0.0.0.0",
     "allowedIps": ["0.0.0.0"],
-    "fullName": "Pippo Pluto",
-    "id": "681bb85a60e63ab280b1c13a"
+    "lastLogin": "2025-05-22T12:58:40.101Z",
+    "lastUpdateAt": "2025-05-22T12:58:40.103Z",
+    "fullName": "Alex Violatto",
+    "id": "ID_UTENTE"
   }
 ]
 ```
