@@ -31,16 +31,17 @@
 
 ```json
 {
-  "firstName": "John",
-  "lastName": "Doe",
-  "username": "johndoe@gmail.com",
-  "password": "Password123",
-  "picture": "https://www.url.com",
-  "birthDate": "2000-01-01",
-  "gender": "male",
-  "preferredLanguage": "it",
-  "timeZone": "Europe/Rome",
-  "role": "user"
+  "newUser": {
+    "firstName": "Alex",
+    "lastName": "Violatto",
+    "role": "user",
+    "createdAt": "2025-05-22T10:49:31.263Z",
+    "lastAllowedIp": "0.0.0.0",
+    "allowedIps": ["0.0.0.0"],
+    "fullName": "Alex Violatto",
+    "id": "id"
+  },
+  "message": "User register succesfully."
 }
 ```
 
@@ -133,21 +134,17 @@ _Risposta_:
 
 ```json
 {
-    "newUser": {
-        "firstName": "Pippo",
-        "lastName": "Pluto",
-        "isActive": false,
-        "role": "user",
-        "createdAt": "2025-05-14T12:49:12.906Z",
-        "lastAllowedIp": "0.0.0.0",
-        "allowedIps": [
-            "0.0.0.0"
-        ],
-        "confirmationToken": "token",
-        "fullName": "Pippo Pluto",
-        "id": "id"
-    },
-    "message": "User register succesfully."
+  "newUser": {
+    "firstName": "Alex",
+    "lastName": "Violatto",
+    "role": "user",
+    "createdAt": "2025-05-22T10:49:31.263Z",
+    "lastAllowedIp": "0.0.0.0",
+    "allowedIps": ["0.0.0.0"],
+    "fullName": "Alex Violatto",
+    "id": "id"
+  },
+  "message": "User register succesfully."
 }
 ```
 
@@ -169,20 +166,16 @@ _Risposta_:
 
 ```json
 {
-    "newUser": {
-        "firstName": "Pippo",
-        "lastName": "Pluto",
-        "isActive": false,
-        "role": "user",
-        "createdAt": "2025-05-14T12:49:12.906Z",
-        "lastAllowedIp": "0.0.0.0",
-        "allowedIps": [
-            "0.0.0.0"
-        ],
-        "confirmationToken": "token",
-        "fullName": "Pippo Pluto",
-        "id": "id"
-    },
-    "message": "User register succesfully, please check the email and confirm the email verification."
+  "newUser": {
+    "firstName": "Alex",
+    "lastName": "Violatto",
+    "role": "user",
+    "createdAt": "2025-05-22T10:49:31.263Z",
+    "lastAllowedIp": "0.0.0.0",
+    "allowedIps": ["0.0.0.0"],
+    "fullName": "Alex Violatto",
+    "id": "id"
+  },
+  "message": "User register succesfully, please check the email and confirm the email verification."
 }
 ```

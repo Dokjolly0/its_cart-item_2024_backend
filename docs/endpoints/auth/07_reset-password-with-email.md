@@ -2,14 +2,17 @@
 
 ## 📍 Endpoint
 
-- POST `http://localhost:PORT/api/reset-password-with-email`
+- POST `http://localhost:PORT/api/reset-password-with-email?token=TOKEN&userId=USER_ID`
+- Parametri URL:
+- `token`: token ricevuto via email
+- `userId`: ID dell'utente
+- Parametri Body:
+- `newPassword`: nuova password da impostare
 
 ## 🧩 Body richiesto
 
 ```json
 {
-  "userId": "6818a2c1016f654dc1dccd3c",
-  "token": "tokenricevuto",
   "newPassword": "NuovaPassword123"
 }
 ```

@@ -29,16 +29,15 @@ _Risposta_:
 
 ```json
 {
-  "user": {
-    "firstName": "Pippo",
-    "lastName": "Pluto",
-    "isActive": true,
+  "newUser": {
+    "firstName": "Alex",
+    "lastName": "Violatto",
     "role": "user",
-    "createdAt": "2025-05-05T11:36:33.273Z",
+    "createdAt": "2025-05-22T10:49:31.263Z",
     "lastAllowedIp": "0.0.0.0",
     "allowedIps": ["0.0.0.0"],
-    "fullName": "Pippo Pluto",
-    "id": "6818a2c1016f654dc1dccd3c"
+    "fullName": "Alex Violatto",
+    "id": "id"
   },
   "token": "TOKEN"
 }

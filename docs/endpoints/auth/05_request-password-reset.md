@@ -16,7 +16,8 @@
 
 ```json
 {
-  "message": "Controlla la tua email per reimpostare la password."
+  "message": "Controlla la tua email per reimpostare la password.",
+  "url": "url"
 }
 ```
 

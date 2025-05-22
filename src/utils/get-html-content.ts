@@ -1,5 +1,11 @@
+import { requireEnvVars } from "./dotenv";
+
+const SERVER_URI = requireEnvVars("SERVER_URI");
+export const urlResetPassword = (token: string, userId: string) =>
+  `${SERVER_URI}/reset-password-with-email?token=${token}&userId=${userId}`;
+
 export function getHtmlRequestChangePassword(token: string, userId: string) {
-  const resetLink = `http://localhost:4200/reset-password-with-email?token=${token}&userId=${userId}`;
+  const resetLink = urlResetPassword(token, userId);
   const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;">
             <h2 style="color: #333;">Conferma il reset della password</h2>

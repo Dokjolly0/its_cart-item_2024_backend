@@ -3,7 +3,6 @@ import path from "path";
 import { Request, Response, NextFunction } from "express";
 import { TypedRequest } from "../../utils/typed-request";
 import { UnauthorizedError } from "../../errors/unoutorized-error";
-import { NotFoundError } from "../../errors/not-found";
 import { UserModel } from "./user.model";
 import userService from "./user.service";
 
@@ -28,21 +27,6 @@ export const getUserById = async (req: TypedRequest, res: Response, next: NextFu
     const userToFind: string = req.params.id;
     const result = await userService.getUserById(user.id!, userToFind);
     res.json(result);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const findUserByFullName = async (req: TypedRequest, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user!;
-    const fullName: string = req.params.fullName as string;
-    const [firstName, ...rest] = fullName.split(" ");
-    const lastName = rest.join(" ");
-
-    const users = await userService.findUserByFullName(user.id!, firstName, lastName);
-    if (!users) throw new NotFoundError();
-    res.json(users);
   } catch (err) {
     next(err);
   }
@@ -74,9 +58,10 @@ export const validatePassword = async (req: Request, res: Response, next: NextFu
 export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username } = req.body;
-    await userService.requestPasswordReset(username);
+    const url: string = await userService.requestPasswordReset(username);
     res.status(200).json({
       message: "Controlla la tua email per le istruzioni di reset della password.",
+      url,
     });
   } catch (error) {
     next(error);

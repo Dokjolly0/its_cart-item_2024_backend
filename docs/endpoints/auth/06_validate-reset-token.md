@@ -12,11 +12,15 @@
 ## ✅ Risposta (Token Valido)
 
 ```json
-true
+{
+  "message": "Token valido."
+}
 ```
 
 ## ❌ Risposta (Token non valido o scaduto)
 
 ```json
-false
+{
+  "message": "Token non valido o scaduto."
+}
 ```

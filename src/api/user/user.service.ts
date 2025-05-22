@@ -14,7 +14,7 @@ import { getIP } from "../../utils/fetch-ip";
 import { notThrowDotEnvError, requireEnvVars } from "../../utils/dotenv";
 import { AuthCredential } from "../auth/auth.entity";
 import { emailService } from "../../utils/services/email.service";
-import { getHtmlRequestChangePassword } from "../../utils/get-html-content";
+import { getHtmlRequestChangePassword, urlResetPassword } from "../../utils/get-html-content";
 import { Mongoose, Types } from "mongoose";
 
 let ADMIN_USER_NAME: string | undefined = requireEnvVars("ADMIN_USER_NAME", notThrowDotEnvError);
@@ -88,14 +88,6 @@ export class UserService {
     return await UserIdentityModel.findOne({ user: userId });
   }
 
-  async findUserByFullName(userId: string, firstName: string, lastName: string) {
-    const isAuthenticated = await UserModel.findById(userId);
-    if (!isAuthenticated) throw new UnauthorizedError();
-    const user = await UserModel.findOne({ firstName, lastName });
-    if (!user) new NotFoundError();
-    return user;
-  }
-
   async resetPassword(userId: string, newPassword: string): Promise<void> {
     const user = await UserModel.findById(userId);
     if (!user) throw new UnauthorizedError();
@@ -134,7 +126,7 @@ export class UserService {
     return false;
   }
 
-  async requestPasswordReset(username: string): Promise<void> {
+  async requestPasswordReset(username: string): Promise<string> {
     const user = await UserIdentityModel.findOne({
       "credentials.username": username,
     });
@@ -149,6 +141,7 @@ export class UserService {
     await user.save();
     const htmlContent = getHtmlRequestChangePassword(token, user.id);
     await emailService.sendEmail(username, "Reimposta la tua password", htmlContent);
+    return urlResetPassword(token, user.id);
   }
 
   async validatePasswordResetToken(token: string, userId: string): Promise<boolean> {
@@ -164,14 +157,12 @@ export class UserService {
     const identity = await UserIdentityModel.findById(userId);
     if (!identity || identity.resetPasswordExpires! < new Date() || identity.resetPasswordToken !== token)
       throw new UnauthorizedError();
+    console.log("Pass");
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     identity.resetPasswordToken = null;
     identity.resetPasswordExpires = null;
-    await UserIdentityModel.updateOne(
-      { user: userId, provider: "local" },
-      { "credentials.hashedPassword": hashedPassword }
-    );
+    identity.credentials.hashedPassword = hashedPassword;
     await identity.save();
   }
 }
