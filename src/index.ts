@@ -20,4 +20,5 @@ mongoose
   })
   .catch((err) => {
     console.error(err);
+    logService.createErrorLog(err, "Server Start Error", `Failed to start server: ${err.message}`, "system");
   });
