@@ -9,7 +9,7 @@ const API_URL = "/api";
 
 beforeAll(async () => {
   await mongoose.connect(process.env.MONGO_URI!, {
-    dbName: process.env.DB_NAME,
+    dbName: "auth_test_db",
   });
 });
 
@@ -74,7 +74,18 @@ describe("Auth Routes", () => {
     token = res.body.token;
   });
 
+  const waitForIdentity = async (username: string, retries = 10, delay = 200): Promise<void> => {
+    for (let i = 0; i < retries; i++) {
+      const identity = await UserIdentityModel.findOne({ "credentials.username": username });
+      if (identity) return;
+      await new Promise((res) => setTimeout(res, delay));
+    }
+    throw new Error("User identity not found after multiple attempts");
+  };
+
   it("should request password reset", async () => {
+    await waitForIdentity(userCredentials.username); // Aspetta finché esiste
+
     const res = await request(app)
       .post(`${API_URL}/request-password-reset`)
       .send({ username: userCredentials.username });
@@ -90,7 +101,7 @@ describe("Auth Routes", () => {
     }).populate("user");
 
     const user = identity?.user;
-    console.log("[DEBUG] Utente trovato:", user);
+    // console.log("[DEBUG] Utente trovato:", user);
     expect(user).not.toBeNull();
 
     // Richiesta reset password
@@ -98,21 +109,22 @@ describe("Auth Routes", () => {
       .post(`${API_URL}/request-password-reset`)
       .send({ username: userCredentials.username });
 
-    console.log("[DEBUG] Risposta request-password-reset:", resetReq.statusCode, resetReq.body);
+    // console.log("[DEBUG] Risposta request-password-reset:", resetReq.statusCode, resetReq.body);
 
     // Aspetta un po' per permettere il salvataggio del token
-    await new Promise((res) => setTimeout(res, 100));
+    await new Promise((res) => setTimeout(res, 300));
 
     if (!user || !user.id) {
+      console.error("[DEBUG] User not found or user ID is missing" + `User: ${user} - IDENTITY: ${identity}`);
       throw new Error("User not found or user ID is missing");
     }
 
     // Verifica esistenza token
     const refreshedIdentity = await userService.getUserIdentityByUserId(user.id);
-    console.log("[DEBUG] Identity aggiornata:", refreshedIdentity);
+    // console.log("[DEBUG] Identity aggiornata:", refreshedIdentity);
 
     const resetToken = refreshedIdentity?.resetPasswordToken;
-    console.log("[DEBUG] Token reset:", resetToken);
+    // console.log("[DEBUG] Token reset:", resetToken);
     expect(resetToken).toBeDefined();
 
     const identityId = identity!._id.toString(); // 👈 Usiamo identity._id
@@ -122,7 +134,7 @@ describe("Auth Routes", () => {
       .get(`${API_URL}/validate-reset-token`)
       .query({ token: resetToken, userId: identityId });
 
-    console.log("[DEBUG] validate-reset-token response:", validate.statusCode, validate.body);
+    // console.log("[DEBUG] validate-reset-token response:", validate.statusCode, validate.body);
     expect(validate.statusCode).toBe(200);
 
     // Reimposta la password
@@ -131,7 +143,7 @@ describe("Auth Routes", () => {
       .query({ token: resetToken, userId: identityId })
       .send({ newPassword: "newSecurePass123" });
 
-    console.log("[DEBUG] reset-password-with-email response:", reset.statusCode, reset.body);
+    // console.log("[DEBUG] reset-password-with-email response:", reset.statusCode, reset.body);
     expect(reset.statusCode).toBe(200);
   });
 
