@@ -35,8 +35,8 @@ describe("Auth Routes", () => {
     const res = await request(app).post(`${API_URL}/register`).send(userCredentials);
 
     expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty("user");
-    userId = res.body.user._id;
+    expect(res.body).toHaveProperty("newUser");
+    userId = res.body.newUser._id;
   });
 
   it("should not login before email confirmation (if required)", async () => {
